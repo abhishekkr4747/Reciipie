@@ -1,30 +1,29 @@
 package com.example.recipesearchapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.recipesearchapp.api.ApiService
-import com.example.recipesearchapp.api.RetrofitInstance
-import com.example.recipesearchapp.models.RandomRecipeApiResponse
-import com.example.recipesearchapp.screens.SignInScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.recipesearchapp.bottomNavigationBar.BottomBar
+import com.example.recipesearchapp.navigation.SetupNavGraph
+import com.example.recipesearchapp.screens.Dashboard
 import com.example.recipesearchapp.ui.theme.RecipeSearchAppTheme
-import com.example.recipesearchapp.widgets.BottomNavigationBar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.recipesearchapp.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,41 +35,28 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     RecipeSearchAppTheme {
-        SignInScreen()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(RetrofitInstance.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val navController: NavHostController = rememberNavController()
+        var buttonsVisible by remember { mutableStateOf(true) }
 
-        val apiService = retrofit.create(ApiService::class.java)
-
-        val call = apiService.getRandomRecipe(
-            apiKey = "1fb613da06e142b39477505f8347765c",
-            number = "10"
-        )
-
-        call.enqueue(object : Callback<RandomRecipeApiResponse>{
-            override fun onResponse(
-                call: Call<RandomRecipeApiResponse>,
-                response: Response<RandomRecipeApiResponse>
+        Scaffold(
+            bottomBar = {
+                if (buttonsVisible) {
+                    BottomBar(
+                        navController = navController,
+                        state = buttonsVisible,
+                        modifier = Modifier
+                    )
+                }
+            }) { paddingValues ->
+            Box(
+                modifier = Modifier.padding(paddingValues)
             ) {
-                if (response.isSuccessful) {
-                    val apiResponse = response.body()
-
-                    println(apiResponse)
-                    Log.d("TAG", "onResponse: $apiResponse")
-                } else {
-                    println(response.message())
-                    Log.d("TAG", "onResponse: $response.message()")
+                SetupNavGraph(navController = navController) {
+                        isVisible ->
+                    buttonsVisible = isVisible
                 }
             }
-
-            override fun onFailure(call: Call<RandomRecipeApiResponse>, t: Throwable) {
-                println(t.message)
-                Log.d("TAG", "onResponse: ${t.message}")
-            }
-
-        })
+        }
     }
 }
 

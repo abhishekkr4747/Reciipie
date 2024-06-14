@@ -1,6 +1,10 @@
-package com.example.recipesearchapp.models
+package com.example.recipesearchapp.models.SearchRecipeModel
 
-data class Recipe(
+import com.example.recipesearchapp.models.RandomRecipeModel.AnalyzedInstruction
+import com.example.recipesearchapp.models.RandomRecipeModel.ExtendedIngredient
+import com.example.recipesearchapp.models.RandomRecipeModel.Nutrition
+
+data class SearchRecipeApiResponse(
     val vegetarian: Boolean,
     val vegan: Boolean,
     val glutenFree: Boolean,
@@ -12,12 +16,11 @@ data class Recipe(
     val lowFodmap: Boolean,
     val weightWatcherSmartPoints: Long,
     val gaps: String,
-    val preparationMinutes: Any?,
-    val cookingMinutes: Any?,
+    val preparationMinutes: Long?,
+    val cookingMinutes: Long?,
     val aggregateLikes: Long,
     val healthScore: Long,
     val creditsText: String,
-    val license: String,
     val sourceName: String,
     val pricePerServing: Double,
     val extendedIngredients: List<ExtendedIngredient>,
@@ -28,14 +31,24 @@ data class Recipe(
     val sourceUrl: String,
     val image: String,
     val imageType: String,
+    val nutrition: Nutrition,
     val summary: String,
-    val cuisines: List<Any?>,
+    val cuisines: List<String>,
     val dishTypes: List<String>,
-    val diets: List<String>,
+    val diets: List<Any?>,
     val occasions: List<Any?>,
+    val winePairing: WinePairing,
     val instructions: String,
     val analyzedInstructions: List<AnalyzedInstruction>,
+    val report: Any?,
+    val tips: Tips,
+    val openLicense: Long,
+    val suspiciousDataScore: Double,
+    val approved: Long,
+    val unknownIngredients: List<Any?>,
+    val userTags: List<Any?>,
     val originalId: Any?,
     val spoonacularScore: Double,
-    val spoonacularSourceUrl: String
+    val spoonacularSourceUrl: String,
+    val license: String?,
 )

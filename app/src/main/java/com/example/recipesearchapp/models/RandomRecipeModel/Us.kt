@@ -1,6 +1,6 @@
-package com.example.recipesearchapp.models
+package com.example.recipesearchapp.models.RandomRecipeModel
 
-data class Metric(
+data class Us(
     val amount: Double,
     val unitShort: String,
     val unitLong: String

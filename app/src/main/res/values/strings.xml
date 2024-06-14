@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Recipe Search App</string>
+
+    <string name="apiKey">1fb613da06e142b39477505f8347765c</string>
 </resources>

@@ -1,9 +1,9 @@
-package com.example.recipesearchapp.models
+package com.example.recipesearchapp.models.RandomRecipeModel
 
 data class ExtendedIngredient(
     val id: Long,
     val aisle: String,
-    val image: String,
+    val image: String?,
     val consistency: String,
     val name: String,
     val nameClean: String,
@@ -12,5 +12,5 @@ data class ExtendedIngredient(
     val amount: Double,
     val unit: String,
     val meta: List<String>,
-    val measures: Measures
+    val measures: Measures,
 )

@@ -2,7 +2,19 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="RecipeView">
+      <entry key="BottomBar">
+        <State />
+      </entry>
+      <entry key="Dashboard">
+        <State />
+      </entry>
+      <entry key="FavouriteRecipeView">
+        <State />
+      </entry>
+      <entry key="IngredientsBottomSheet">
+        <State />
+      </entry>
+      <entry key="SearchScreen">
         <State />
       </entry>
       <entry key="app">

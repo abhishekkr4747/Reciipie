@@ -30,11 +30,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.recipesearchapp.R
+import com.example.recipesearchapp.bottomNavigationBar.BottomNavigationItems
 
-@Preview
 @Composable
-fun SignInScreen() {
+fun SignInScreen(
+    navController: NavHostController
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -76,15 +80,15 @@ fun SignInScreen() {
                 fontSize = 16.sp
             )
             Spacer(modifier = Modifier.height(32.dp))
-            GoogleSignInButton()
+            GoogleSignInButton(navController)
         }
     }
 }
 
 @Composable
-fun GoogleSignInButton() {
+fun GoogleSignInButton(navController: NavHostController) {
     Button(
-        onClick = { /* Handle sign in */ },
+        onClick = { navController.navigate(BottomNavigationItems.Dashboard.route) },
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEA4335)),
         modifier = Modifier
             .fillMaxWidth()

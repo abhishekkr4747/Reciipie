@@ -1,4 +1,4 @@
-package com.example.recipesearchapp.models
+package com.example.recipesearchapp.models.RandomRecipeModel
 
 data class RandomRecipeApiResponse(
     val recipes: List<Recipe>

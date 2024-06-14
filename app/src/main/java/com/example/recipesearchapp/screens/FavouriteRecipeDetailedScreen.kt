@@ -1,14 +1,30 @@
 package com.example.recipesearchapp.screens
 
-
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,25 +38,23 @@ import androidx.room.Room
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.recipesearchapp.R
-import com.example.recipesearchapp.models.RandomRecipeModel.Equipment
-import com.example.recipesearchapp.models.RandomRecipeModel.Ingredient2
-import com.example.recipesearchapp.room.model.FavouriteRecipe
 import com.example.recipesearchapp.room.database.FavouriteRecipeDatabase
+import com.example.recipesearchapp.room.model.FavRecipeEquipments
+import com.example.recipesearchapp.room.model.FavRecipeIngredients
+import com.example.recipesearchapp.room.model.FavouriteRecipe
 import com.example.recipesearchapp.viewmodel.MainViewModel
 import com.example.recipesearchapp.viewmodel.SharedViewModel
-import com.example.recipesearchapp.widgets.CircularItemRowEquipments
-import com.example.recipesearchapp.widgets.CircularItemRowIngredients
+import com.example.recipesearchapp.widgets.CircularItemElement
 import com.example.recipesearchapp.widgets.ExpandableSection
 import com.example.recipesearchapp.widgets.RecipeInfoCard
-import com.example.recipesearchapp.widgets.SectionTitle
 import kotlinx.coroutines.flow.first
 
 @Composable
-fun RecipeView(
+fun FavouriteRecipeDetailedScreen(
     sharedViewModel: SharedViewModel
 ) {
     val viewModel: MainViewModel = viewModel()
-    val recipe by sharedViewModel.recipeState
+    val favRecipe by sharedViewModel.favRecipeState
 
     val context = LocalContext.current
 
@@ -54,33 +68,30 @@ fun RecipeView(
     //getting dao from notes database
     val recipeDao = db.dao()
 
-    recipe?.let {
+    favRecipe?.let {
 
-        var filled by remember { mutableStateOf(false) }
+        var filled by remember { mutableStateOf(true) }
         var initialLoad by remember { mutableStateOf(true) }
 
-        val ingredients = mutableListOf<Ingredient2>()
-        val equipments = mutableListOf<Equipment>()
-        val ingredientsName = mutableListOf<String>()
-        val ingredientsImage = mutableListOf<String>()
-        val equipmentsName = mutableListOf<String>()
-        val equipmentsImage = mutableListOf<String>()
+        val favIngredients = mutableListOf<FavRecipeIngredients>()
+        val favEquipments = mutableListOf<FavRecipeEquipments>()
 
-        for (instruction in it.analyzedInstructions) {
-            for (step in instruction.steps) {
-                equipments.addAll(step.equipment)
-                ingredients.addAll(step.ingredients)
-            }
+        for (i in it.ingredientsName.indices) {
+            favIngredients.add(
+                FavRecipeIngredients(
+                    ingredientsName = it.ingredientsName[i],
+                    ingredientsImage = it.ingredientsImage[i]
+                )
+            )
         }
 
-        for (ingredient in ingredients) {
-            ingredientsName.addAll(listOf(ingredient.name))
-            ingredientsImage.addAll(listOf(ingredient.image))
-        }
-
-        for (equipment in equipments) {
-            equipmentsName.addAll(listOf(equipment.name))
-            equipmentsImage.addAll(listOf(equipment.image))
+        for (i in it.equipmentsName.indices) {
+            favEquipments.add(
+                FavRecipeEquipments(
+                    equipmentsName = it.equipmentsName[i],
+                    equipmentsImage = it.equipmentsImage[i]
+                )
+            )
         }
 
         LaunchedEffect(Unit) {
@@ -138,6 +149,7 @@ fun RecipeView(
 
                 CommonTitle(title = "Ingredients")
 
+
                 val favouriteRecipe = FavouriteRecipe(
                     id = it.id,
                     title = it.title,
@@ -145,11 +157,11 @@ fun RecipeView(
                     readyInMinutes = it.readyInMinutes,
                     servings = it.servings.toString(),
                     pricePerServing = it.pricePerServing.toString(),
-                    ingredientsName = ingredientsName,
-                    ingredientsImage = ingredientsImage,
+                    ingredientsName = it.ingredientsName,
+                    ingredientsImage = it.ingredientsImage,
                     instructions = it.instructions,
-                    equipmentsName = equipmentsName,
-                    equipmentsImage = equipmentsImage,
+                    equipmentsName = it.equipmentsName,
+                    equipmentsImage = it.equipmentsImage,
                     summary = it.summary
                 )
                 //marking favourite recipe
@@ -165,7 +177,13 @@ fun RecipeView(
                     }
                 }
 
-                CircularItemRowIngredients(ingredients)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(favIngredients) {ingredient->
+                        CircularItemElement(name = ingredient.ingredientsName, imageUrl = ingredient.ingredientsImage)
+                    }
+                }
 
                 CommonTitle(title = "Instructions")
 
@@ -177,7 +195,13 @@ fun RecipeView(
 
                 CommonTitle(title = "Equipments")
 
-                CircularItemRowEquipments(equipments)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(favEquipments) {equipment->
+                        CircularItemElement(name = equipment.equipmentsName, imageUrl = equipment.equipmentsImage)
+                    }
+                }
 
                 CommonTitle(title = "Quick Summary")
 
@@ -197,23 +221,8 @@ fun RecipeView(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                ExpandableSection(title = "Good for health nutrition", expand = false)
-            }
+                ExpandableSection(title = "Good for health nutrition", expand = false) }
         }
-        
+
     }
-
 }
-
-
-@Composable
-fun CommonTitle(title: String) {
-    Spacer(modifier = Modifier.height(20.dp))
-
-    SectionTitle(title = title)
-
-    Spacer(modifier = Modifier.height(16.dp))
-}
-
-
-

@@ -1,17 +1,12 @@
 package com.example.recipesearchapp.widgets
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,23 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,14 +35,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.recipesearchapp.R
+import com.example.recipesearchapp.models.RandomRecipeModel.Equipment
+import com.example.recipesearchapp.models.RandomRecipeModel.Ingredient2
 
 @Composable
 fun SectionTitle(title: String) {
@@ -68,17 +56,77 @@ fun SectionTitle(title: String) {
     )
 }
 
+
 @Composable
-fun RecipeCard() {
+fun AllRecipeCard(
+    title: String,
+    cookingTime: String,
+    imageUrl: String?,
+    onItemClicked: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = RoundedCornerShape(12.dp))
+            .clickable { onItemClicked() },
+        shadowElevation = 8.dp,
+        border = BorderStroke(width = 1.dp,
+            color = Color(0xFFE7F0F8))
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(100.dp)
+            )
+
+            Column {
+                Text(
+                    text = title,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = Color.Black
+                )
+
+                Text(
+                    text = "Ready in $cookingTime minutes",
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = Color(0xFF606F89)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RecipeCard(
+    title: String,
+    cookingTime: String,
+    imageUrl: String?,
+    onItemClicked: () -> Unit
+) {
     Box(
         modifier = Modifier
             .size(156.dp)
             .clip(shape = RoundedCornerShape(14.dp))
             .background(Color.Black)
+            .clickable { onItemClicked() }
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.paneer),
-            contentDescription = null,
+
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "Recipe Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
@@ -93,13 +141,13 @@ fun RecipeCard() {
         ) {
 
             Text(
-                text = "Shahi Paneer",
+                text = title,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 color = Color.White
             )
             Text(
-                text = "Ready in 25 min",
+                text = "Ready in $cookingTime min",
                 fontSize = 12.sp,
                 color = Color(0xFFE7F0F8),
             )
@@ -107,92 +155,7 @@ fun RecipeCard() {
     }
 }
 
-@Composable
-fun RecipeRow() {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        items(5) {
-            RecipeCard()
-        }
-    }
-}
 
-@Composable
-fun AllRecipeCard() {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = RoundedCornerShape(12.dp)),
-        shadowElevation = 8.dp,
-        border = BorderStroke(width = 1.dp,
-            color = Color(0xFFE7F0F8))
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.recipes_image),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(100.dp)
-            )
-
-            Column {
-                Text(
-                    text = "Recipe name goes here",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = Color.Black
-                )
-
-                Text(
-                    text = "Ready in 25 minutes",
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = Color(0xFF606F89)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun AllRecipeColumn() {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        items(5) {
-            AllRecipeCard()
-        }
-    }
-}
-
-@Composable
-fun BottomNavigationBar() {
-    NavigationBar(
-        containerColor = Color.White
-    ) {
-        NavigationBarItem(
-            icon = {
-                Icon(imageVector = ImageVector.vectorResource(R.drawable.home),
-                    contentDescription = null
-                ) },
-            label = { Text("Home") },
-            selected = true,
-            onClick = { /* Handle navigation */ }
-        )
-        NavigationBarItem(
-            icon = { Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.favourite),
-                contentDescription = null
-            ) },
-            label = { Text("Favourite") },
-            selected = false,
-            onClick = { /* Handle navigation */ }
-        )
-    }
-}
 
 @Composable
 fun RecipeInfoCard(
@@ -230,8 +193,8 @@ fun RecipeInfoCard(
 
 @Composable
 fun CircularItemElement(
-    @DrawableRes drawable: Int = R.drawable.ingridient_image,
-    text: String = "Paneer",
+    name: String,
+    imageUrl: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -243,8 +206,12 @@ fun CircularItemElement(
                 .size(86.dp)
                 .clip(CircleShape)
         ) {
-            Image(
-                painter = painterResource(drawable),
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -252,7 +219,7 @@ fun CircularItemElement(
         }
 
         Text(
-            text = text,
+            text = name,
             modifier = Modifier.paddingFromBaseline(top = 20.dp),
             fontSize = 12.sp,
         )
@@ -260,20 +227,35 @@ fun CircularItemElement(
 }
 
 @Composable
-fun CircularItemRow(
+fun CircularItemRowIngredients(
+    ingredients: List<Ingredient2>,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(5) {
-            CircularItemElement()
+        items(ingredients) {ingredient->
+            CircularItemElement(name = ingredient.name, imageUrl = ingredient.image)
         }
     }
 }
 
-@Preview(showBackground = true)
+@Composable
+fun CircularItemRowEquipments(
+    equipments: List<Equipment>,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items(equipments) {equipment->
+            CircularItemElement(name = equipment.name, imageUrl = equipment.image)
+        }
+    }
+}
+
 @Composable
 fun ExpandableSection(
     title: String = "abc",
@@ -282,9 +264,11 @@ fun ExpandableSection(
 ) {
     var expanded by remember { mutableStateOf(expand) }
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .background(color = Color(0xFFF2F7FD))
             .padding(top = 8.dp, bottom = 8.dp)
+            .clickable { expanded = !expanded }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -311,6 +295,31 @@ fun ExpandableSection(
                 fontSize = 16.sp
             )
         }
+    }
+}
+
+@Composable
+fun SearchRecipeElement(
+    title: String,
+    onItemClicked: () -> Unit
+    ) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .padding(8.dp)
+            .clickable { onItemClicked() },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.search_recipe_icon),
+            contentDescription = null
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(text = title)
     }
 }
 

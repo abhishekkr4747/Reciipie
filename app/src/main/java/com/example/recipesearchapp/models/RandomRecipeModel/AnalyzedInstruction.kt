@@ -1,4 +1,4 @@
-package com.example.recipesearchapp.models
+package com.example.recipesearchapp.models.RandomRecipeModel
 
 data class AnalyzedInstruction(
     val name: String,
