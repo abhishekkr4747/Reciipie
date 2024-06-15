@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -12,26 +14,6 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        buildConfigField(
-            "String",
-            "API_KEY_1",
-            "\"${project.findProperty("API_KEY_1")}\""
-        )
-        buildConfigField(
-            "String",
-            "API_KEY_2",
-            "\"${project.findProperty("API_KEY_2")}\""
-        )
-        buildConfigField(
-            "String",
-            "API_KEY_3",
-            "\"${project.findProperty("API_KEY_3")}\""
-        )
-        buildConfigField(
-            "String",
-            "API_KEY_4",
-            "\"${project.findProperty("API_KEY_4")}\""
-        )
         applicationId = "com.example.recipesearchapp"
         minSdk = 24
         targetSdk = 34
@@ -42,6 +24,25 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val properties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { stream ->
+                properties.load(stream)
+            }
+        }
+
+        // Retrieve the properties
+        val apiKey1: String = properties.getProperty("api_1.key", "")
+        val apiKey2: String = properties.getProperty("api_2.key", "")
+        val apiKey3: String = properties.getProperty("api_3.key", "")
+        val apiKey4: String = properties.getProperty("api_4.key", "")
+
+        buildConfigField("String", "API_KEY_1", "\"${apiKey1}\"")
+        buildConfigField("String", "API_KEY_2", "\"${apiKey2}\"")
+        buildConfigField("String", "API_KEY_3", "\"${apiKey3}\"")
+        buildConfigField("String", "API_KEY_4", "\"${apiKey4}\"")
     }
 
     buildTypes {
