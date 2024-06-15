@@ -12,6 +12,26 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        buildConfigField(
+            "String",
+            "API_KEY_1",
+            "\"${project.findProperty("API_KEY_1")}\""
+        )
+        buildConfigField(
+            "String",
+            "API_KEY_2",
+            "\"${project.findProperty("API_KEY_2")}\""
+        )
+        buildConfigField(
+            "String",
+            "API_KEY_3",
+            "\"${project.findProperty("API_KEY_3")}\""
+        )
+        buildConfigField(
+            "String",
+            "API_KEY_4",
+            "\"${project.findProperty("API_KEY_4")}\""
+        )
         applicationId = "com.example.recipesearchapp"
         minSdk = 24
         targetSdk = 34
@@ -42,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

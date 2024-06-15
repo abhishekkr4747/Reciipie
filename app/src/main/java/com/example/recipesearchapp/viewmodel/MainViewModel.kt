@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipesearchapp.BuildConfig
 import com.example.recipesearchapp.api.ApiService
 import com.example.recipesearchapp.models.AutoCompleteRecipeModel.AutoCompleteRecipeSearchApiResponse
 import com.example.recipesearchapp.models.RandomRecipeModel.RandomRecipeApiResponse
@@ -33,7 +34,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiService.getRandomRecipe(
-                    apiKey = "a2dfbbe0e8fe493286c8002c56ec6d13",
+                    apiKey = BuildConfig.API_KEY_1,
                     number = "10",
                     "vegetarian",
                     true
@@ -56,7 +57,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiService.getRandomRecipe(
-                    apiKey = "a2dfbbe0e8fe493286c8002c56ec6d13",
+                    apiKey = BuildConfig.API_KEY_2,
                     number = "10",
                     "indian",
                     true
@@ -79,7 +80,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiService.getAutocompleteRecipeSearch(
-                    apiKey = "6eac2dde0585480b9ac97353999eaf3c",
+                    apiKey = BuildConfig.API_KEY_3,
                     number = "5",
                     query
                 )
@@ -104,7 +105,7 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiService.getRecipeInformationBulk(
-                    apiKey = "6eac2dde0585480b9ac97353999eaf3c",
+                    apiKey = BuildConfig.API_KEY_4,
                     ids = ids,
                     includeNutrition = true
                 )
