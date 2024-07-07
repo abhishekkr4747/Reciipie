@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Recipe Search App</string>
-
-    <string name="apiKey">1fb613da06e142b39477505f8347765c</string>
+    <string name="app_name">Reciipie</string>
+    <string name="web_client_id">85790975806-40mtm4iodo9gcc61h04c189oas4ei5d6.apps.googleusercontent.com</string>
 </resources>

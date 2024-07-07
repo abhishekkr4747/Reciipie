@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id ("com.google.gms.google-services")
     //Kotlin parcelize annotation plugin
     id("kotlin-parcelize")
     //kotlin annotation plugin
@@ -95,6 +96,9 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     //kotlin extension for coroutine support with activities
     implementation ("androidx.activity:activity-ktx:1.8.2")
+    //Firebase SDK and Google Auth
+    implementation ("com.google.firebase:firebase-auth-ktx:21.1.0")
+    implementation ("com.google.android.gms:play-services-auth:20.4.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

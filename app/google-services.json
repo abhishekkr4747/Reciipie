@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "85790975806",
+    "project_id": "recipe-search-app-497aa",
+    "storage_bucket": "recipe-search-app-497aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85790975806:android:1ddbbae6f08fc4e85dae6f",
+        "android_client_info": {
+          "package_name": "com.example.recipesearchapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAczF0sXbtvfZYUSzp_J05rA3GtkYXPwrE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

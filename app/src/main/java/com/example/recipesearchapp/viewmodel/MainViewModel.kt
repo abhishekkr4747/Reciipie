@@ -6,12 +6,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipesearchapp.BuildConfig
-import com.example.recipesearchapp.api.ApiService
-import com.example.recipesearchapp.models.AutoCompleteRecipeModel.AutoCompleteRecipeSearchApiResponse
-import com.example.recipesearchapp.models.RandomRecipeModel.RandomRecipeApiResponse
-import com.example.recipesearchapp.models.SearchRecipeModel.SearchRecipeApiResponse
-import com.example.recipesearchapp.room.model.FavouriteRecipe
-import com.example.recipesearchapp.room.dao.FavouriteRecipeDao
+import com.example.recipesearchapp.data.remote.ApiService
+import com.example.recipesearchapp.data.remote.model.AutoCompleteRecipeModel.AutoCompleteRecipeSearchApiResponse
+import com.example.recipesearchapp.data.remote.model.RandomRecipeModel.RandomRecipeApiResponse
+import com.example.recipesearchapp.data.remote.model.SearchRecipeModel.SearchRecipeApiResponse
+import com.example.recipesearchapp.data.room.dao.FavouriteRecipeDao
+import com.example.recipesearchapp.data.room.model.FavouriteRecipe
+import com.example.recipesearchapp.presentation.google_sign_in.SignInResult
+import com.example.recipesearchapp.presentation.google_sign_in.SignInState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -21,6 +26,8 @@ class MainViewModel: ViewModel() {
     var allRecipeState = mutableStateOf<RandomRecipeApiResponse?>(null)
     var autoCompleteRecipeState = mutableStateListOf<AutoCompleteRecipeSearchApiResponse>()
     var searchRecipeState = mutableStateListOf<SearchRecipeApiResponse>()
+    var isPopularRecipeLoading = mutableStateOf(true)
+    var isAllRecipeLoading = mutableStateOf(true)
 
     val BASE_URL = "https://api.spoonacular.com/"
     val retrofit = Retrofit.Builder()
@@ -42,13 +49,13 @@ class MainViewModel: ViewModel() {
 
                 if(response.isSuccessful) {
                     randomRecipesState.value = response.body()
-                    Log.d("TAG", "onResponse: ${randomRecipesState.value!!.recipes}")
+                    isPopularRecipeLoading.value = false
                 } else {
                     Log.d("error", "onResponse: ${response.code()}")
                 }
 
             } catch (e: Exception) {
-                Log.d("error", "onResponse: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -65,13 +72,13 @@ class MainViewModel: ViewModel() {
 
                 if(response.isSuccessful) {
                     allRecipeState.value = response.body()
-                    Log.d("TAG", "getAllRecipe: ${allRecipeState.value!!.recipes}")
+                    isAllRecipeLoading.value = false
                 } else {
                     Log.d("error", "getAllRecipe: ${response.code()}")
                 }
 
             } catch (e: Exception) {
-                Log.d("error", "getAllRecipe: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -90,7 +97,6 @@ class MainViewModel: ViewModel() {
                         autoCompleteRecipeState.clear()
                         autoCompleteRecipeState.addAll(it)
                     }
-                    Log.d("TAG", "getAutoCompleteRecipe: ${autoCompleteRecipeState}")
                 } else {
                     Log.d("error", "getAutoCompleteRecipe: ${response.code()}")
                 }
@@ -144,5 +150,19 @@ class MainViewModel: ViewModel() {
                 e.stackTrace
             }
         }
+    }
+
+    private val _state = MutableStateFlow(SignInState())
+    val state = _state.asStateFlow()
+
+    fun onSignInResult(result: SignInResult) {
+        _state.update { it.copy(
+            isSignInSuccessful = result.data != null,
+            signInError = result.errorMessage
+        ) }
+    }
+
+    fun resetState() {
+        _state.update { SignInState() }
     }
 }

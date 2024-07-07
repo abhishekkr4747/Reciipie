@@ -2,8 +2,9 @@ package com.example.recipesearchapp.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.recipesearchapp.models.RandomRecipeModel.Recipe
-import com.example.recipesearchapp.room.model.FavouriteRecipe
+import com.example.recipesearchapp.data.remote.model.RandomRecipeModel.Recipe
+import com.example.recipesearchapp.data.room.model.FavouriteRecipe
+
 
 class SharedViewModel: ViewModel() {
 
