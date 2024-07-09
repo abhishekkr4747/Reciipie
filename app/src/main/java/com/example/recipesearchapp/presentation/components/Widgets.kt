@@ -38,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -163,7 +164,7 @@ fun RecipeCard(
 }
 
 
-
+@Preview
 @Composable
 fun RecipeInfoCard(
     title: String = "Ready in",
@@ -172,6 +173,7 @@ fun RecipeInfoCard(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
             .background(Color.White)
@@ -186,7 +188,6 @@ fun RecipeInfoCard(
         Text(
             text = title,
             color = Color(0xFF606F89),
-            modifier = Modifier.padding(top = 8.dp),
             fontSize = 12.sp
         )
         Text(

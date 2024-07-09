@@ -4,14 +4,26 @@ package com.example.recipesearchapp.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,16 +40,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.recipesearchapp.R
 import com.example.recipesearchapp.data.remote.model.RandomRecipeModel.Recipe
-import com.example.recipesearchapp.presentation.google_sign_in.UserData
-import com.example.recipesearchapp.presentation.navigation.Screen
-import com.example.recipesearchapp.viewmodel.MainViewModel
-import com.example.recipesearchapp.viewmodel.SharedViewModel
 import com.example.recipesearchapp.presentation.components.AllRecipeCard
 import com.example.recipesearchapp.presentation.components.ComponentAllRecipe
 import com.example.recipesearchapp.presentation.components.ComponentPopularRecipe
 import com.example.recipesearchapp.presentation.components.RecipeCard
 import com.example.recipesearchapp.presentation.components.SectionTitle
 import com.example.recipesearchapp.presentation.components.ShimmerEffect
+import com.example.recipesearchapp.presentation.google_sign_in.UserData
+import com.example.recipesearchapp.presentation.navigation.Screen
+import com.example.recipesearchapp.viewmodel.MainViewModel
+import com.example.recipesearchapp.viewmodel.SharedViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +66,7 @@ fun Dashboard(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(color = Color.White)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically

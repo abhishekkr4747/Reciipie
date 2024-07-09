@@ -2,6 +2,7 @@ package com.example.recipesearchapp.presentation.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,16 +19,17 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.room.Room
 import com.example.recipesearchapp.data.room.database.FavouriteRecipeDatabase
 import com.example.recipesearchapp.data.room.model.FavouriteRecipe
-import com.example.recipesearchapp.presentation.navigation.Screen
-import com.example.recipesearchapp.viewmodel.SharedViewModel
 import com.example.recipesearchapp.presentation.components.AllRecipeCard
 import com.example.recipesearchapp.presentation.components.SectionTitle
+import com.example.recipesearchapp.presentation.navigation.Screen
+import com.example.recipesearchapp.viewmodel.SharedViewModel
 
 
 @Composable
@@ -53,6 +55,7 @@ fun FavouriteRecipeView(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(color = Color.White)
     ) {
         SectionTitle(title = "Favourite recipes")
 

@@ -1,9 +1,11 @@
 package com.example.recipesearchapp.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,9 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.recipesearchapp.data.remote.model.SearchRecipeModel.SearchRecipeApiResponse
+import com.example.recipesearchapp.presentation.components.SearchRecipeElement
 import com.example.recipesearchapp.presentation.components.bottomSheet.BottomSheet
 import com.example.recipesearchapp.viewmodel.MainViewModel
-import com.example.recipesearchapp.presentation.components.SearchRecipeElement
 
 @Preview(showBackground = true)
 @Composable
@@ -61,6 +63,8 @@ fun SearchScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(color = Color.White)
+            .systemBarsPadding()
     ) {
         SearchBar(
             value = searchValue,

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -46,11 +47,11 @@ import com.example.recipesearchapp.data.room.model.FavRecipeEquipments
 import com.example.recipesearchapp.data.room.model.FavRecipeIngredients
 import com.example.recipesearchapp.data.room.model.FavRecipeInstructions
 import com.example.recipesearchapp.data.room.model.FavouriteRecipe
-import com.example.recipesearchapp.viewmodel.MainViewModel
-import com.example.recipesearchapp.viewmodel.SharedViewModel
 import com.example.recipesearchapp.presentation.components.CircularItemElement
 import com.example.recipesearchapp.presentation.components.ExpandableSection
 import com.example.recipesearchapp.presentation.components.RecipeInfoCard
+import com.example.recipesearchapp.viewmodel.MainViewModel
+import com.example.recipesearchapp.viewmodel.SharedViewModel
 import kotlinx.coroutines.flow.first
 
 @Composable
@@ -118,6 +119,8 @@ fun FavouriteRecipeDetailedScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .background(color = Color.White)
+                .systemBarsPadding()
         ) {
             Box {
                 AsyncImage(
