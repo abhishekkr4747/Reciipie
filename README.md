@@ -8,4 +8,6 @@ Reciipie offers a seamless way to search, save, and explore delicious recipes ri
 - Recipe Search: Easily search any recipe and view detailed information.
 - Favorites: Mark and store your favorite recipes in local storage for quick access.
 
-
+### Status
+<a href="https://github.com/abhishekkr4747/Reciipie/releases"><img src="https://img.shields.io/github/v/release/Aditya-gupta99/EvoCharge-App" alt="release"/></a>
+<a href="https://github.com/abhishekkr4747/Reciipie/actions"><img src="https://img.shields.io/github/checks-status/Aditya-gupta99/EvoCharge-App/master?label=build" alt="build"/></a>
