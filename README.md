@@ -4,7 +4,7 @@ Reciipie offers a seamless way to search, save, and explore delicious recipes ri
 
 ### Features
 - Google Authentication: Secure and easy login with your Google account.
-- Dashboard Screen: Search bar to find recipes and view popular and regular recipes fetched from an API.
+- Dashboard Screen: Search bar to find recipes and view popular and regular recipes fetched from [Spoonacular api](https://spoonacular.com/food-api).
 - Recipe Search: Easily search any recipe and view detailed information.
 - Favorites: Mark and store your favorite recipes in local storage for quick access.
 
