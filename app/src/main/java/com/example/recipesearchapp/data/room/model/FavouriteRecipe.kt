@@ -21,7 +21,8 @@ data class FavouriteRecipe(
     val step: List<String>,
     val equipmentsName: List<String>,
     val equipmentsImage: List<String>,
-    val summary: String
+    val summary: String,
+    val sourceUrl : String
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readLong(),
@@ -37,6 +38,7 @@ data class FavouriteRecipe(
         parcel.createStringArrayList()!!,
         parcel.createStringArrayList()!!,
         parcel.createStringArrayList()!!,
+        parcel.readString()!!,
         parcel.readString()!!
     ) {
     }
@@ -56,6 +58,7 @@ data class FavouriteRecipe(
         parcel.writeStringList(equipmentsName)
         parcel.writeStringList(equipmentsImage)
         parcel.writeString(summary)
+        parcel.writeString(sourceUrl)
     }
 
     override fun describeContents(): Int {

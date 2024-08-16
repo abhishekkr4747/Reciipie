@@ -25,12 +25,14 @@ import com.example.recipesearchapp.presentation.screens.RecipeView
 import com.example.recipesearchapp.presentation.screens.SearchScreen
 import com.example.recipesearchapp.presentation.screens.SignInScreen
 import com.example.recipesearchapp.viewmodel.MainViewModel
+import com.example.recipesearchapp.viewmodel.RecipeViewModel
 import com.example.recipesearchapp.viewmodel.SharedViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 @Composable
 fun SetupNavGraph(navController: NavHostController,
+                  recipeViewModel: RecipeViewModel,
                   onBottomBarVisibilityChanged: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
@@ -102,6 +104,7 @@ fun SetupNavGraph(navController: NavHostController,
                 navController = navController,
                 sharedViewModel = sharedViewModel,
                 userData = googleAuthUiClient.getSignedInUser(),
+                recipeViewModel = recipeViewModel,
                 onSignOut = {
                     coroutineScope.launch {
                         googleAuthUiClient.signOut()
@@ -120,22 +123,22 @@ fun SetupNavGraph(navController: NavHostController,
 
         composable(route = BottomNavigationItems.Favourite.route) {
             onBottomBarVisibilityChanged(true)
-            FavouriteRecipeView(navController = navController, sharedViewModel = sharedViewModel)
+            FavouriteRecipeView(navController = navController, sharedViewModel = sharedViewModel, recipeViewModel)
         }
 
         composable(route = Screen.RecipeView.route) {
             onBottomBarVisibilityChanged(false)
-            RecipeView(sharedViewModel = sharedViewModel)
+            RecipeView(sharedViewModel = sharedViewModel, recipeViewModel)
         }
 
         composable(route = Screen.FavouriteRecipeDetailedScreen.route) {
             onBottomBarVisibilityChanged(false)
-            FavouriteRecipeDetailedScreen(sharedViewModel = sharedViewModel)
+            FavouriteRecipeDetailedScreen(sharedViewModel = sharedViewModel, recipeViewModel)
         }
 
         composable(route = Screen.SearchScreen.route) {
             onBottomBarVisibilityChanged(false)
-            SearchScreen(navController = navController)
+            SearchScreen(navController = navController, recipeViewModel)
         }
     }
 }

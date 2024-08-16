@@ -67,7 +67,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
     packaging {
         resources {
@@ -85,20 +85,26 @@ dependencies {
     // ViewModel and LiveData for MVVM architecture
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
     implementation ("androidx.lifecycle:lifecycle-livedata:2.8.3")
-    //Coil for url to image
+    // Dagger 2
+    implementation ("com.google.dagger:dagger:2.51.1")
+    kapt ("com.google.dagger:dagger-compiler:2.51.1")
+    // Coil for url to image
     implementation("io.coil-kt:coil-compose:2.6.0")
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
     // Room and Lifecycle dependencies
     implementation ("androidx.room:room-runtime:2.6.1")
+    implementation(libs.androidx.runtime.livedata)
     kapt("androidx.room:room-compiler:2.6.1")
-    //kotlin extensions for coroutine support with room
+    // kotlin extensions for coroutine support with room
     implementation("androidx.room:room-ktx:2.6.1")
-    //kotlin extension for coroutine support with activities
+    // kotlin extension for coroutine support with activities
     implementation ("androidx.activity:activity-ktx:1.9.0")
-    //Firebase SDK and Google Auth
+    // Firebase SDK and Google Auth
     implementation ("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation ("com.google.android.gms:play-services-auth:21.2.0")
+    // WorkManager
+    implementation ("androidx.work:work-runtime-ktx:2.9.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

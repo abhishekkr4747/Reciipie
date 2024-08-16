@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,14 +25,21 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,55 +57,59 @@ import com.example.recipesearchapp.presentation.components.ShimmerEffect
 import com.example.recipesearchapp.presentation.google_sign_in.UserData
 import com.example.recipesearchapp.presentation.navigation.Screen
 import com.example.recipesearchapp.viewmodel.MainViewModel
+import com.example.recipesearchapp.viewmodel.RecipeViewModel
 import com.example.recipesearchapp.viewmodel.SharedViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dashboard(
     navController: NavHostController,
     sharedViewModel: SharedViewModel,
     userData: UserData?,
+    recipeViewModel: RecipeViewModel,
     onSignOut: () -> Unit
 ) {
-    val viewModel: MainViewModel = viewModel()
+
+    recipeViewModel.getFavouriteRecipes()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .background(color = Color.White)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .background(color = Color.White)
         ) {
-            if(userData?.username != null) {
-                GreetingSection(userName = userData.username)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if(userData?.username != null) {
+                    GreetingSection(userName = userData.username)
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.logout_vector),
+                    contentDescription = null,
+                    tint = Color(0xFFEA4335),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { onSignOut() }
+                )
             }
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.logout_vector),
-                contentDescription = null,
-                tint = Color(0xFFEA4335),
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable { onSignOut() }
-            )
+            Spacer(modifier = Modifier.height(10.dp))
+            SearchBar(navController)
+            Spacer(modifier = Modifier.height(20.dp))
+            SectionTitle(title = "Popular Recipes")
+            Spacer(modifier = Modifier.height(16.dp))
+            RecipeRow(sharedViewModel, navController, recipeViewModel)
+            Spacer(modifier = Modifier.height(25.dp))
+            SectionTitle(title = "All Recipes")
+            Spacer(modifier = Modifier.height(16.dp))
+            AllRecipeColumn(sharedViewModel, navController, recipeViewModel)
         }
-        Spacer(modifier = Modifier.height(10.dp))
-        SearchBar(navController)
-        Spacer(modifier = Modifier.height(20.dp))
-        SectionTitle(title = "Popular Recipes")
-        Spacer(modifier = Modifier.height(16.dp))
-        RecipeRow(viewModel, sharedViewModel, navController)
-        Spacer(modifier = Modifier.height(25.dp))
-        SectionTitle(title = "All recipes")
-        Spacer(modifier = Modifier.height(16.dp))
-        AllRecipeColumn(viewModel, sharedViewModel, navController)
-    }
 }
+
+
 
 @Composable
 fun GreetingSection(userName: String = "User") {
@@ -142,18 +154,20 @@ fun SearchBar(navController: NavHostController) {
 
 @Composable
 fun RecipeRow(
-    viewModel: MainViewModel,
     sharedViewModel: SharedViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    recipeViewModel: RecipeViewModel
     ) {
-    val isLoading by viewModel.isPopularRecipeLoading
-    val response by viewModel.randomRecipesState
+    val isLoading by recipeViewModel.randomRecipesLoadingLiveData.observeAsState()
+    val response by recipeViewModel.randomRecipesLiveData.observeAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getRandomRecipe()
+    LaunchedEffect(isLoading) {
+        if (isLoading == true) {
+            recipeViewModel.getRandomRecipes()
+        }
     }
 
-    if (isLoading) {
+    if (isLoading == true) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -175,48 +189,8 @@ fun RecipeRow(
                         cookingTime = recipeItem.readyInMinutes.toString(),
                         imageUrl = recipeItem.image
                     ) {
-                        val recipe = Recipe(
-                            vegetarian = recipeItem.vegetarian,
-                            vegan = recipeItem.vegan,
-                            glutenFree = recipeItem.glutenFree,
-                            dairyFree = recipeItem.dairyFree,
-                            veryHealthy = recipeItem.veryHealthy,
-                            cheap = recipeItem.cheap,
-                            veryPopular = recipeItem.veryPopular,
-                            sustainable = recipeItem.sustainable,
-                            lowFodmap = recipeItem.lowFodmap,
-                            weightWatcherSmartPoints = recipeItem.weightWatcherSmartPoints,
-                            gaps = recipeItem.gaps,
-                            preparationMinutes = recipeItem.preparationMinutes,
-                            cookingMinutes = recipeItem.cookingMinutes,
-                            aggregateLikes = recipeItem.aggregateLikes,
-                            healthScore = recipeItem.healthScore,
-                            creditsText = recipeItem.creditsText,
-                            license = recipeItem.license,
-                            sourceName = recipeItem.sourceName,
-                            pricePerServing = recipeItem.pricePerServing,
-                            extendedIngredients = recipeItem.extendedIngredients,
-                            id = recipeItem.id,
-                            title = recipeItem.title,
-                            author = recipeItem.author,
-                            readyInMinutes = recipeItem.readyInMinutes,
-                            servings = recipeItem.servings,
-                            sourceUrl = recipeItem.sourceUrl,
-                            image = recipeItem.image,
-                            imageType = recipeItem.imageType,
-                            nutrition = recipeItem.nutrition,
-                            summary = recipeItem.summary,
-                            cuisines = recipeItem.cuisines,
-                            dishTypes = recipeItem.dishTypes,
-                            diets = recipeItem.diets,
-                            occasions = recipeItem.occasions,
-                            instructions = recipeItem.instructions,
-                            analyzedInstructions = recipeItem.analyzedInstructions,
-                            originalId = recipeItem.originalId,
-                            spoonacularScore = recipeItem.spoonacularScore,
-                            spoonacularSourceUrl = recipeItem.spoonacularSourceUrl
-                        )
-                        sharedViewModel.addRecipe(newRecipe = recipe)
+
+                        sharedViewModel.addRecipe(newRecipe = recipeItem)
                         navController.navigate(Screen.RecipeView.route)
                     }
                 }
@@ -227,18 +201,20 @@ fun RecipeRow(
 
 @Composable
 fun AllRecipeColumn(
-    viewModel: MainViewModel,
     sharedViewModel: SharedViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    recipeViewModel: RecipeViewModel
 ) {
-    val isLoading by viewModel.isAllRecipeLoading
-    val response by viewModel.allRecipeState
+    val isLoading by recipeViewModel.allRecipesLoadingLiveData.observeAsState()
+    val response by recipeViewModel.allRecipesLiveData.observeAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getAllRecipe()
+    LaunchedEffect(isLoading) {
+        if (isLoading == true) {
+            recipeViewModel.getAllRecipe()
+        }
     }
 
-    if (isLoading) {
+    if (isLoading == true) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -260,48 +236,7 @@ fun AllRecipeColumn(
                         cookingTime = recipeItem.readyInMinutes.toString(),
                         imageUrl = recipeItem.image
                     ) {
-                        val recipe = Recipe(
-                            vegetarian = recipeItem.vegetarian,
-                            vegan = recipeItem.vegan,
-                            glutenFree = recipeItem.glutenFree,
-                            dairyFree = recipeItem.dairyFree,
-                            veryHealthy = recipeItem.veryHealthy,
-                            cheap = recipeItem.cheap,
-                            veryPopular = recipeItem.veryPopular,
-                            sustainable = recipeItem.sustainable,
-                            lowFodmap = recipeItem.lowFodmap,
-                            weightWatcherSmartPoints = recipeItem.weightWatcherSmartPoints,
-                            gaps = recipeItem.gaps,
-                            preparationMinutes = recipeItem.preparationMinutes,
-                            cookingMinutes = recipeItem.cookingMinutes,
-                            aggregateLikes = recipeItem.aggregateLikes,
-                            healthScore = recipeItem.healthScore,
-                            creditsText = recipeItem.creditsText,
-                            license = recipeItem.license,
-                            sourceName = recipeItem.sourceName,
-                            pricePerServing = recipeItem.pricePerServing,
-                            extendedIngredients = recipeItem.extendedIngredients,
-                            id = recipeItem.id,
-                            title = recipeItem.title,
-                            author = recipeItem.author,
-                            readyInMinutes = recipeItem.readyInMinutes,
-                            servings = recipeItem.servings,
-                            sourceUrl = recipeItem.sourceUrl,
-                            image = recipeItem.image,
-                            imageType = recipeItem.imageType,
-                            nutrition = recipeItem.nutrition,
-                            summary = recipeItem.summary,
-                            cuisines = recipeItem.cuisines,
-                            dishTypes = recipeItem.dishTypes,
-                            diets = recipeItem.diets,
-                            occasions = recipeItem.occasions,
-                            instructions = recipeItem.instructions,
-                            analyzedInstructions = recipeItem.analyzedInstructions,
-                            originalId = recipeItem.originalId,
-                            spoonacularScore = recipeItem.spoonacularScore,
-                            spoonacularSourceUrl = recipeItem.spoonacularSourceUrl
-                        )
-                        sharedViewModel.addRecipe(newRecipe = recipe)
+                        sharedViewModel.addRecipe(newRecipe = recipeItem)
                         navController.navigate(Screen.RecipeView.route)
                     }
                 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,24 +37,24 @@ import com.example.recipesearchapp.data.remote.model.SearchRecipeModel.SearchRec
 import com.example.recipesearchapp.presentation.components.SearchRecipeElement
 import com.example.recipesearchapp.presentation.components.bottomSheet.BottomSheet
 import com.example.recipesearchapp.viewmodel.MainViewModel
+import com.example.recipesearchapp.viewmodel.RecipeViewModel
 
-@Preview(showBackground = true)
 @Composable
 fun SearchScreen(
-    navController: NavHostController = NavHostController(LocalContext.current)
+    navController: NavHostController = NavHostController(LocalContext.current),
+    recipeViewModel: RecipeViewModel
 ) {
-    val viewModel: MainViewModel = viewModel()
     var searchValue by remember { mutableStateOf("") }
     var showSheet by remember { mutableStateOf(false) }
     var searchRecipe = remember { mutableStateOf<SearchRecipeApiResponse?>(null) }
 
-    val autoCompleteResponse = viewModel.autoCompleteRecipeState
-    val searchResponse = viewModel.searchRecipeState
+    val autoCompleteResponse by recipeViewModel.autoCompleteRecipesLiveData.observeAsState()
+    val searchResponse by recipeViewModel.searchRecipesLiveData.observeAsState()
 
 
     if (showSheet) {
         searchRecipe.value?.let {
-            BottomSheet(it) {
+            BottomSheet(it, recipeViewModel) {
                 showSheet = false
             }
         }
@@ -76,26 +77,34 @@ fun SearchScreen(
 
         if (searchValue.isNotEmpty()) {
             LaunchedEffect(searchValue) {
-                viewModel.getAutoCompleteRecipe(query = searchValue)
+                recipeViewModel.getAutoCompleteRecipe(query = searchValue)
             }
         }
 
-        if (autoCompleteResponse.isNotEmpty()) {
-            val recipeIds = autoCompleteResponse.map { it.id.toString() }.joinToString(",")
-            LaunchedEffect(recipeIds) {
-                viewModel.getSearchRecipe(ids = recipeIds)
+        autoCompleteResponse?.let {
+            if (autoCompleteResponse!!.isNotEmpty()) {
+                val recipeIds = autoCompleteResponse!!.map { it.id.toString() }.joinToString(",")
+                LaunchedEffect(recipeIds) {
+                    recipeViewModel.getSearchedRecipes(ids = recipeIds)
+                }
             }
         }
 
         if(searchValue.isNotEmpty()) {
-            LazyColumn {
-                items(autoCompleteResponse) { recipeItem ->
-                    SearchRecipeElement(title = recipeItem.title){
-                        val recipe = searchResponse.filter {
-                            it.id == recipeItem.id
+            autoCompleteResponse?.let {
+                searchResponse?.let {
+                    LazyColumn {
+                        items(autoCompleteResponse!!) { recipeItem ->
+                            SearchRecipeElement(title = recipeItem.title){
+                                val recipe = searchResponse?.filter {
+                                    it.id == recipeItem.id
+                                }
+                                if (recipe != null) {
+                                    searchRecipe.value = recipe.first()
+                                }
+                                showSheet = true
+                            }
                         }
-                        searchRecipe.value = recipe.first()
-                        showSheet = true
                     }
                 }
             }

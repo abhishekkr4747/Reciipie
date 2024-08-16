@@ -15,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,27 +31,21 @@ import com.example.recipesearchapp.data.room.model.FavouriteRecipe
 import com.example.recipesearchapp.presentation.components.AllRecipeCard
 import com.example.recipesearchapp.presentation.components.SectionTitle
 import com.example.recipesearchapp.presentation.navigation.Screen
+import com.example.recipesearchapp.viewmodel.RecipeViewModel
 import com.example.recipesearchapp.viewmodel.SharedViewModel
 
 
 @Composable
 fun FavouriteRecipeView(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    recipeViewModel: RecipeViewModel
 ) {
-    val context = LocalContext.current
+    val favouriteRecipes by recipeViewModel.favouriteRecipesLiveData.observeAsState()
 
-    // Creating instance of database
-    val db = Room.databaseBuilder(
-        context,
-        FavouriteRecipeDatabase::class.java,
-        "favouriterecipe-database"
-    ).build()
-
-    // Getting DAO from the database
-    val recipeDao = db.dao()
-
-    val favouriteRecipes = remember { mutableStateListOf<FavouriteRecipe>() }
+    LaunchedEffect(Unit) {
+        recipeViewModel.getFavouriteRecipes()
+    }
 
     Column(
         modifier = Modifier
@@ -57,60 +53,51 @@ fun FavouriteRecipeView(
             .padding(16.dp)
             .background(color = Color.White)
     ) {
-        SectionTitle(title = "Favourite recipes")
+        SectionTitle(title = "Favourite Recipes")
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        LaunchedEffect(Unit) {
-            recipeDao.fetchAllFavorRecipes().collect { recipeList ->
-                if (recipeList.isNotEmpty()) {
-                    favouriteRecipes.clear()
-                    favouriteRecipes.addAll(recipeList)
-                    Log.d("TAG", "FavouriteRecipeView: $favouriteRecipes")
-                } else {
-                    Toast.makeText(context, "No Favourite Recipe Added", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-
-        if (favouriteRecipes.isNotEmpty()) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(favouriteRecipes) { recipeItem ->
-                    AllRecipeCard(
-                        title = recipeItem.title,
-                        cookingTime = recipeItem.readyInMinutes.toString(),
-                        imageUrl = recipeItem.image
-                    ) {
-                        val favouriteRecipe = FavouriteRecipe(
-                            id = recipeItem.id,
+        favouriteRecipes?.let {
+            if (favouriteRecipes!!.isNotEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(favouriteRecipes!!) { recipeItem ->
+                        AllRecipeCard(
                             title = recipeItem.title,
-                            image = recipeItem.image,
-                            readyInMinutes = recipeItem.readyInMinutes,
-                            servings = recipeItem.servings,
-                            pricePerServing = recipeItem.pricePerServing,
-                            ingredientsName = recipeItem.ingredientsName,
-                            ingredientsImage = recipeItem.ingredientsImage,
-                            instructions = recipeItem.instructions,
-                            recipeItem.stepNumber,
-                            recipeItem.step,
-                            equipmentsName = recipeItem.equipmentsName,
-                            equipmentsImage = recipeItem.equipmentsImage,
-                            summary = recipeItem.summary
-                        )
+                            cookingTime = recipeItem.readyInMinutes.toString(),
+                            imageUrl = recipeItem.image
+                        ) {
+                            val favouriteRecipe = FavouriteRecipe(
+                                id = recipeItem.id,
+                                title = recipeItem.title,
+                                image = recipeItem.image,
+                                readyInMinutes = recipeItem.readyInMinutes,
+                                servings = recipeItem.servings,
+                                pricePerServing = recipeItem.pricePerServing,
+                                ingredientsName = recipeItem.ingredientsName,
+                                ingredientsImage = recipeItem.ingredientsImage,
+                                instructions = recipeItem.instructions,
+                                recipeItem.stepNumber,
+                                recipeItem.step,
+                                equipmentsName = recipeItem.equipmentsName,
+                                equipmentsImage = recipeItem.equipmentsImage,
+                                summary = recipeItem.summary,
+                                sourceUrl = recipeItem.sourceUrl
+                            )
 
-                        sharedViewModel.addFavRecipe(newFavRecipe = favouriteRecipe)
-                        navController.navigate(Screen.FavouriteRecipeDetailedScreen.route)
+                            sharedViewModel.addFavRecipe(newFavRecipe = favouriteRecipe)
+                            navController.navigate(Screen.FavouriteRecipeDetailedScreen.route)
+                        }
                     }
                 }
+            } else {
+                Text(
+                    text = "No Favourite Recipe Added",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
-        } else {
-            Text(
-                text = "No Favourite Recipe Added",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
         }
     }
 }

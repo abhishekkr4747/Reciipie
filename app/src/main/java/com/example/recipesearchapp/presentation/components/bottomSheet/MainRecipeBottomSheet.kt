@@ -1,5 +1,7 @@
 package com.example.recipesearchapp.presentation.components.bottomSheet
 
+import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.Button
@@ -41,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -70,14 +74,15 @@ import com.example.recipesearchapp.presentation.components.CircularItemElement
 import com.example.recipesearchapp.presentation.components.RecipeInfoCard
 import com.example.recipesearchapp.presentation.screens.CommonTitle
 import com.example.recipesearchapp.viewmodel.MainViewModel
+import com.example.recipesearchapp.viewmodel.RecipeViewModel
 import kotlinx.coroutines.flow.first
 
 @Composable
 fun MainRecipeBottomSheet(
     recipe: SearchRecipeApiResponse,
+    recipeViewModel: RecipeViewModel,
     onDismissRequest: () -> Unit
 ) {
-    val viewModel: MainViewModel = viewModel()
     var filled by remember { mutableStateOf<Boolean?>(null) }
     var initialLoad by remember { mutableStateOf(true) }
     var fullRecipe by remember { mutableStateOf(false) }
@@ -85,19 +90,12 @@ fun MainRecipeBottomSheet(
 
     val context = LocalContext.current
 
-    //creating instance of database
-    val db = Room.databaseBuilder(
-        context,
-        FavouriteRecipeDatabase::class.java,
-        "favouriterecipe-database"
-    ).build()
-
-    //getting dao from notes database
-    val recipeDao = db.dao()
+    val favRecipes by recipeViewModel.favouriteRecipesLiveData.observeAsState()
 
     LaunchedEffect(Unit) {
-        val favoriteRecipes = recipeDao.fetchAllFavorRecipes().first()
-        filled = favoriteRecipes.any { favRecipe -> favRecipe.title == recipe.title }
+        recipeViewModel.getFavouriteRecipes()
+        val favoriteRecipes = favRecipes
+        filled = favoriteRecipes?.any { favRecipe -> favRecipe.title == recipe.title }
         initialLoad = false
     }
 
@@ -149,16 +147,17 @@ fun MainRecipeBottomSheet(
         stepsValue,
         equipmentsName = equipmentsName,
         equipmentsImage = equipmentsImage,
-        summary = recipe.summary
+        summary = recipe.summary,
+        sourceUrl = recipe.sourceUrl
     )
     //marking favourite recipe
     if (!initialLoad) {
         LaunchedEffect(filled) {
             if(filled != null) {
                 if (filled == true) {
-                    viewModel.upsertFavouriteRecipe(recipeDao = recipeDao, recipe = favouriteRecipe)
+                    recipeViewModel.addFavouriteRecipe(favouriteRecipe)
                 } else {
-                    viewModel.deleteFavouriteRecipe(recipeDao = recipeDao, recipe = favouriteRecipe)
+                    recipeViewModel.deleteFavouriteRecipe(favouriteRecipe)
                 }
             }
         }
@@ -196,22 +195,49 @@ fun MainRecipeBottomSheet(
                         fontWeight = FontWeight.Bold
                     )
 
-                    Icon(painter = if (filled == true) painterResource(id = R.drawable.filled_favourite) else painterResource(id = R.drawable.favourite),
-                        contentDescription = null,
-                        tint = Color.Red,
-                        modifier = Modifier
-                            .clickable {
-                                if (!initialLoad) {
-                                    filled = !filled!!
-                                    val message = if (filled == true) {
-                                        "Marked as favourite"
-                                    } else {
-                                        "Removed from favourite"
-                                    }
-                                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = null,
+                            tint = Color.Red,
+                            modifier = Modifier.clickable {
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/*"
+                                    putExtra(Intent.EXTRA_TEXT, "Check out this tasty recipe: ${recipe.sourceUrl}")
+                                }
+                                try {
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Log.d("TAG", "RecipeView: $e")
                                 }
                             }
-                    )
+                                .size(20.dp)
+                        )
+
+                        Icon(painter = if (filled == true) painterResource(id = R.drawable.filled_favourite) else painterResource(
+                            id = R.drawable.favourite
+                        ),
+                            contentDescription = null,
+                            tint = Color.Red,
+                            modifier = Modifier
+                                .clickable {
+                                    if (!initialLoad) {
+                                        filled?.let {
+
+                                            filled = !filled!!
+                                            val message = if (filled == true) {
+                                                "Marked as favourite"
+                                            } else {
+                                                "Removed from favourite"
+                                            }
+                                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -432,24 +458,6 @@ private fun FullRecipeColumn(recipe: SearchRecipeApiResponse) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        com.example.recipesearchapp.presentation.components.ExpandableSection(
-            title = "Nutrition",
-            expand = true
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        com.example.recipesearchapp.presentation.components.ExpandableSection(
-            title = "Bad for health nutrition",
-            expand = false
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        com.example.recipesearchapp.presentation.components.ExpandableSection(
-            title = "Good for health nutrition",
-            expand = false
-        )
     }
 }
 
@@ -472,7 +480,7 @@ private fun IngredientsColumn(recipe: SearchRecipeApiResponse) {
         items(ingredients) {ingredientItem->
             CircularItemElementIngredient(
                 name = ingredientItem.name,
-                imageUrl = ingredientItem.image
+                imageUrl = "https://img.spoonacular.com/ingredients_100x100/${ingredientItem.image}"
             )
         }
     }

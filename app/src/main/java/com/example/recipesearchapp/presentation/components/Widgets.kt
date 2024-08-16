@@ -71,8 +71,10 @@ fun AllRecipeCard(
             .clip(shape = RoundedCornerShape(12.dp))
             .clickable { onItemClicked() },
         shadowElevation = 8.dp,
+        tonalElevation = 8.dp,
         border = BorderStroke(width = 1.dp,
-            color = Color(0xFFE7F0F8))
+            color = Color(0xFFE7F0F8)),
+        color = Color.White
     ) {
         Row{
 
@@ -211,13 +213,13 @@ fun CircularItemElement(
     ) {
         Box(
             modifier = Modifier
-                .size(86.dp)
+                .size(87.dp)
                 .clip(CircleShape)
         ) {
 
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
+                    .data(imageUrl!!)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -244,7 +246,7 @@ fun CircularItemRowIngredients(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(ingredients) {ingredient->
-            CircularItemElement(name = ingredient.name, imageUrl = ingredient.image)
+            CircularItemElement(name = ingredient.name, imageUrl = "https://img.spoonacular.com/ingredients_100x100/${ingredient.image}")
         }
     }
 }

@@ -9,12 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.example.recipesearchapp.data.remote.model.SearchRecipeModel.SearchRecipeApiResponse
+import com.example.recipesearchapp.viewmodel.RecipeViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheet(
     recipe: SearchRecipeApiResponse?,
+    recipeViewModel: RecipeViewModel,
     onDismiss: () -> Unit
 ) {
     val modalBottomSheetState = rememberModalBottomSheetState(
@@ -30,6 +32,7 @@ fun BottomSheet(
         if (recipe != null) {
             MainRecipeBottomSheet(
                 recipe,
+                recipeViewModel,
                 onDismissRequest = { onDismiss() }
             )
         } else
